@@ -2,28 +2,27 @@
 pragma solidity >=0.4.22 <0.8.0;
 
 contract Ballot{
-    uint[] proposals;
+    uint256[] proposals;
     mapping(address => bool) voters;
+    uint256 winningProposal;
+    uint256 winningProposalVotes;
     
     constructor(uint proposalsCount) public{
         proposals.length = proposalsCount;
     }
     
-    function vote(uint proposal) public {
-        bool hasVoted = voters[msg.sender];
-        require(!hasVoted && proposal < proposals.length);
+    function vote(uint256 _proposal) public {
+        bool _hasVoted = voters[msg.sender];
+        require(!_hasVoted && _proposal < proposals.length);
         voters[msg.sender] = true;
-        proposals[proposal]++;
+        proposals[_proposal]++;
+        if (proposals[_proposal] > winningProposalVotes) {
+            winningProposal = _proposal;
+            winningProposalVotes = proposals[_proposal];
+        }
     }
     
-    function winningProposal() public view returns(uint _winningProposal){
-        uint winningVoteCount = 0;
-        for(uint prop = 0; prop < proposals.length; prop++){
-            uint voteCount = proposals[prop];
-            if(voteCount > winningVoteCount){
-                winningVoteCount = voteCount;
-                _winningProposal = prop;
-            }
-        }
+    function getWinningProposal() public view returns(uint256) {
+        return winningProposal;
     }
 }
